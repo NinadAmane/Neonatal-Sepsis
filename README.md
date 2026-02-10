@@ -1,121 +1,138 @@
-# Neonatal-Sepsis
+<div align="center">
 
-[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](#)  
+# 🏥 Neonatal Sepsis Detection Framework
+### Federated Learning | Time-Series Transformers | Privacy Preservation
 
-**Neonatal-Sepsis** — research codebase for modelling and evaluating time-series models for neonatal sepsis detection. Includes preprocessing utilities, local baselines (Transformer, GRU-D for missingness), federated learning simulation (server + clients), and a secure aggregation PoC. Use this repository to run local experiments, simulate federated training, and compare evaluation metrics (AUROC, AUPRC, precision/recall, etc.).
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://neonatal-sepsis.streamlit.app/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
----
+<a href="https://neonatal-sepsis.streamlit.app/">
+  <img src="https://img.shields.io/badge/🚀_View_Live_Deployment-Click_Here-2ea44f?style=for-the-badge" alt="View Deployment" height="40"/>
+</a>
 
-## Table of contents
+<p align="center">
+  <b>A comprehensive research codebase for modelling and evaluating time-series models for neonatal sepsis detection.</b><br>
+  Features <i>Federated Learning simulations</i>, <i>Secure Aggregation</i>, and <i>Transformer-based architectures</i>.
+</p>
 
-- [Key features](#key-features)  
-- [Repository structure](#repository-structure)  
-- [Requirements](#requirements)  
-- [Dataset & expected format (sample included)](#dataset--expected-format-sample-included)  
-- [Quickstart](#quickstart)  
-  - [1. Create & activate venv](#1-create--activate-venv)  
-  - [2. Preprocess raw data (parallel)](#2-preprocess-raw-data-parallel)  
-  - [3. (Optional) Pack into LMDB](#3-optional-pack-into-lmdb)  
-  - [4. Train local baseline (Transformer)](#4-train-local-baseline-transformer)  
-  - [5. Train GRU-D (missing-data aware)](#5-train-gru-d-missing-data-aware)  
-  - [Federated simulation](#federated-simulation)  
-  - [Evaluate & plot results](#evaluate--plot-results)  
-- [Evaluation & artifacts](#evaluation--artifacts)  
-- [Development notes & tips](#development-notes--tips)  
-- [Contributing](#contributing)
-- [Contact](#contact)    
-
+</div>
 
 ---
 
-## Key features
+## 📖 Abstract
 
-- Preprocessing pipeline converting raw per-timestep `.psv` (pipe-separated) data to per-patient `.pt` objects.  
-- Local training: Transformer baseline and GRU-D (handles missingness).  
-- Simple hyperparameter search utilities.  
-- Federated learning simulation (server + multiple clients).  
-- Secure aggregation proof-of-concept (masking demonstration).  
-- Evaluation & plotting tools producing JSON summaries and comparative plots.
+**Neonatal-Sepsis** addresses the critical challenge of early sepsis detection in neonates using time-series clinical data. This repository implements a complete pipeline that allows researchers to:
+1.  **Preprocess** raw clinical logs (pipe-separated values) into deep-learning-ready tensors.
+2.  **Train** state-of-the-art baselines (Transformers, GRU-D for missing data).
+3.  **Simulate** a Federated Learning environment to preserve patient privacy.
+4.  **Visualize** predictions via an interactive web dashboard.
 
 ---
 
-## Repository structure
+## 📑 Table of Contents
 
-```
+- [Key Features](#-key-features)
+- [Repository Structure](#-repository-structure)
+- [System Architecture](#-system-architecture)
+- [Dataset & Format](#-dataset--format)
+- [Installation](#-installation--setup)
+- [Usage](#%EF%B8%8F-usage)
+- [Evaluation Results](#-evaluation-results)
+- [Contributors](#-contributors)
+- [Contact](#-contact)
+
+---
+
+## ⚡ Key Features
+
+| Component | Description |
+| :--- | :--- |
+| **Preprocessing** | Parallelized pipeline converting `.psv` to `.pt` objects. |
+| **Model** | Includes **Transformers** and **GRU-D** (handling missingness via decay). |
+| **Federated Learning** | Simulation of Server-Client architecture with local networking. |
+| **Privacy PoC** | Secure Aggregation Proof-of-Concept using additive masking. |
+| **Visualization** | Complete dashboard for AUROC/AUPRC metrics and real-time inference. |
+
+---
+
+## 📂 Repository Structure
+
+```text
 Neonatal-Sepsis/
-├─ app.py
-├─ dashboard.py
-├─ README.md
-├─ requirements.txt
-├─ eval_results_federated.json
-├─ eval_results_local.json
-├─ model_comparison_plot.png
-├─ model_comparison_plot_prc.png
-├─ app_pages/                
-│  ├─ 1_00_📘_Project_Summary
-│  ├─ 1_03_📈_Predict
-│  └─ 1_04_🧪_Model_Metrics
-└─ src/
-   ├─ parallel_preprocess.py
-   ├─ lmdb_packer.py
-   ├─ model.py
-   ├─ model_grud.py
-   ├─ train_local.py
-   ├─ hyperparam_search.py
-   ├─ split_clients.py
-   ├─ fl_server.py
-   ├─ fl_client.py
-   ├─ secure_agg_poc.py
-   ├─ evaluate.py
-   └─ plot_results.py
-```
+├── app.py                  # Streamlit entry point
+├── app_pages/              # Dashboard UI pages
+│   ├── 1_Project_Summary.py
+│   ├── 2_Predict.py
+│   └── 3_Model_Metrics.py
+├── src/
+│   ├── parallel_preprocess.py   # Data cleaning pipeline
+│   ├── model.py                 # Transformer Architecture
+│   ├── model_grud.py            # GRU-D Architecture
+│   ├── fl_server.py             # Federated Server Logic
+│   ├── fl_client.py             # Federated Client Logic
+│   └── secure_agg_poc.py        # Privacy Preservation Logic
+├── data/                   # Dataset storage (Gitignored)
+└── requirements.txt        # Python dependencies
 
-> Note: If your repo uses a different static/templates path, either move your frontend files into `app_pages/` or update `app.py`/`dashboard.py` to point to the actual path.
+```
 
 ---
 
-## Requirements
+## 🛠 System Architecture
 
-- Python 3.8+ (recommended 3.8–3.11)  
-- Create a virtual environment and install dependencies:
+```mermaid
+graph TD
+    A[Raw Clinical Data .psv] -->|Parallel Preprocess| B(PyTorch Tensors .pt)
+    B --> C{Training Mode}
+    C -->|Local| D[Train Baseline<br>Transformer / GRU-D]
+    C -->|Federated| E[FL Simulation]
+    E --> F[Server Aggregation]
+    E --> G[Client Updates]
+    D --> H[Evaluation & Metrics]
+    F --> H
+    H --> I[Streamlit Dashboard]
+
+```
+
+---
+
+## 📊 Dataset & Format
+
+The pipeline expects **Pipe-Separated Values (`.psv`)**. Each file represents one patient encounter.
+
+* **Location:** Place raw files in `data/raw/` (e.g., `data/raw/patient_01.psv`).
+* **Key Columns:** `HR`, `O2Sat`, `Temp`, `SBP`, `MAP`, `Resp`, `Lactate`, `Age`, `HospAdmTime`.
+* **Target:** `SepsisLabel` (Binary: 0 or 1).
+
+> **Note:** The `parallel_preprocess.py` script automatically handles `NaN` values and generates masking features required for the GRU-D model.
+
+---
+
+## 📦 Installation & Setup
+
+### Prerequisites
+
+* **Python 3.8+**
+* **CUDA** (Optional, for GPU acceleration)
+
+### 1. Clone & Environment
 
 ```bash
-python -m venv .venv
-# activate
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-# Linux / macOS
-source .venv/bin/activate
+git clone [https://github.com/pranay9981/Neonatal-Sepsis.git](https://github.com/pranay9981/Neonatal-Sepsis.git)
+cd Neonatal-Sepsis
 
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
+
+# Install dependencies
 pip install -r requirements.txt
+
 ```
 
----
-
-## Dataset & expected format (sample included)
-
-**Format**: pipe (`|`) separated values (`.psv`). Each row represents a timepoint for an encounter (typically hourly). Preprocessing converts raw `.psv` per-encounter files into per-patient Torch `.pt` objects used by training/federation/evaluation.
-
-**Important columns**:
-- Vital signs / labs:  
-  `HR, O2Sat, Temp, SBP, MAP, DBP, Resp, EtCO2, BaseExcess, HCO3, FiO2, pH, PaCO2, SaO2, AST, BUN, Alkalinephos, Calcium, Chloride, Creatinine, Bilirubin_direct, Glucose, Lactate, Magnesium, Phosphate, Potassium, Bilirubin_total, TroponinI, Hct, Hgb, PTT, WBC, Fibrinogen, Platelets`
-- Demographics / metadata: `Age, Gender, Unit1, Unit2, HospAdmTime, ICULOS`
-- Label: `SepsisLabel` — binary (0/1) per timepoint
-
-**Notes**:
-- Missing values are `NaN`. Preprocessing builds masks and time-since-last-observation features (for GRU-D).
-- Keep the header row intact for each raw `.psv` file.
-- Place raw `.psv` files under `data/raw/` (or pass a different folder to the preprocessing script).
-- Example filename: `data/raw/sample_patient.psv`
-
----
-
-## Quickstart
-
-### 1. Create & activate venv
-(see Requirements above)
-
-### 2. Preprocess raw `.psv` files into per-patient `.pt` (parallel)
+### 2. Run Preprocessing
 
 ```bash
 python src/parallel_preprocess.py \
@@ -123,166 +140,73 @@ python src/parallel_preprocess.py \
   --out_folder data/processed/patients \
   --seq_len 48 \
   --nprocs 8
-```
 
-- `--seq_len`: number of timesteps (e.g., 48).  
-- `--nprocs`: number of parallel workers.
-
-### 3. (Optional) Pack into LMDB (recommended for large datasets)
-
-```bash
-python src/lmdb_packer.py \
-  --in_folder data/processed/patients \
-  --out_folder data/processed/lmdb_shards \
-  --shard_size 4000
-```
-
-### 4. Train local baseline (Transformer)
-
-```bash
-python src/train_local.py \
-  --index data/processed/patients/index_with_labels.pt \
-  --epochs 10 \
-  --batch_size 64 \
-  --model transformer
-```
-
-Training prints the run directory and best checkpoint path (e.g., `runs/.../checkpoints/model_best.pt`).
-
-### 5. Train GRU-D (missing-data aware)
-
-```bash
-python src/train_local.py \
-  --index data/processed/patients/index_with_labels.pt \
-  --epochs 10 \
-  --batch_size 64 \
-  --model grud
-```
-
-### 6. Hyperparameter quick grid
-
-```bash
-python src/hyperparam_search.py
 ```
 
 ---
 
-## Federated simulation
+## 🖥️ Usage
 
-1. Split processed patients into client folders:
+### 📊 Running the Dashboard
+
+Access the prediction interface locally:
 
 ```bash
-python src/split_clients.py \
-  --processed_folder data/processed/patients \
-  --out_root data/processed/clients \
-  --n_clients 3
+streamlit run app.py
+
 ```
 
-2. Start the federated server (terminal 1):
+*Or visit the live deployment: [neonatal-sepsis.streamlit.app*](https://neonatal-sepsis.streamlit.app/)
+
+### 🤖 Training Models
+
+**Local Transformer Baseline:**
 
 ```bash
-python src/fl_server.py \
-  --model transformer \
-  --n_features 40 \
-  --seq_len 48 \
-  --min_clients 2 \
-  --rounds 5
+python src/train_local.py --index data/processed/patients/index.pt --model transformer
+
 ```
 
-3. Start each client (one terminal per client):
+**Federated Simulation (Server):**
 
 ```bash
-python src/fl_client.py \
-  --index data/processed/clients/client1/index.pt \
-  --model transformer \
-  --server_address 127.0.0.1:8080
-```
+python src/fl_server.py --model transformer --rounds 5 --min_clients 2
 
-Repeat for `client2` / `client3`.
-
-### Secure aggregation PoC
-
-```bash
-python src/secure_agg_poc.py
-```
-
-Runs a local proof-of-concept demonstrating additive mask cancellation so the server only observes aggregated updates.
-
----
-
-## Evaluate & plot results
-
-1. Evaluate federated global checkpoint on a held-out client:
-
-```bash
-python src/evaluate.py \
-  --index data/processed/clients/client3/index.pt \
-  --ckpt server_out/global_best.pt \
-  --model transformer \
-  --n_features 40 \
-  --seq_len 48 \
-  --out_file eval_results_federated.json
-```
-
-2. Evaluate a local-only model:
-
-```bash
-python src/evaluate.py \
-  --index data/processed/clients/client3/index.pt \
-  --ckpt runs/<your_local_run>/checkpoints/model_best.pt \
-  --model transformer \
-  --n_features 40 \
-  --seq_len 48 \
-  --out_file eval_results_local.json
-```
-
-3. Generate comparison plot:
-
-```bash
-python src/plot_results.py \
-  --results eval_results_federated.json eval_results_local.json \
-  --out_file model_comparison_plot.png
 ```
 
 ---
 
-## Evaluation & artifacts
+## 📉 Evaluation Results
 
-Outputs produced by scripts:
-- JSON evaluation summaries (AUROC, AUPRC, precision/recall, thresholds).  
-- PNG comparison plots: `model_comparison_plot.png`, `model_comparison_plot_prc.png`.  
-- Checkpoints and training logs in `runs/` or `server_out/`.
+The table below summarizes the performance metrics of our **Global Best (Federated)** model compared to the **Model Best (Local)** baseline.
 
----
-
-## Development notes & tips
-
-- Use LMDB when I/O becomes the bottleneck.  
-- Pin dependency versions in `requirements.txt` for reproducibility.  
-- Save CLI args and random seeds for reproducible experiments.  
-- Federated simulation uses local networking — ensure matching ports and separate terminals or tmux panes.  
-- Inspect `src/parallel_preprocess.py` to see how `NaN` is handled and how masks/time deltas are created for GRU-D.
+| Model | AUROC | AUPRC | Accuracy | F1-Score | Precision | Recall |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Global Best** | **0.894** | **0.567** | **0.947** | **0.579** | **0.712** | 0.487 |
+| **Model Best** | 0.829 | 0.410 | 0.739 | 0.299 | 0.187 | **0.749** |
 
 ---
 
-## Contributing
+## 🤝 Contributors
 
-Contributions welcome. Suggested improvements:
-- Add `data/README.md` describing dataset schema and a small mock `.psv` to help new users run the pipeline end-to-end.  
-- Add unit tests for preprocessing, loaders, and training.  
-- Add Dockerfile / docker-compose for reproducible local federation experiments.
+This project is developed and maintained by:
 
-When opening PRs:
-1. Explain the change & rationale.  
-2. Include runnable examples or tests.  
-3. Keep changes small and focused.
+* **[Pranay](https://github.com/pranay9981)** - *Maintainer*
+* **[Ninad Amane](https://github.com/NinadAmane)** - *Collaborator*
+* **[Rakshak](https://github.com/Rakshak05)** - *Collaborator*
 
 ---
 
-## Contact
+## 📞 Contact
 
-- Maintainer: [`pranay9981`](https://github.com/pranay9981)
-- Collaborators: [`NinadAmane`](https://github.com/NinadAmane), [`Rakshak05`](https://github.com/Rakshak05)  
+If you encounter any bugs or have feature requests, please open an issue on our **[GitHub Issues](https://github.com/pranay9981/Neonatal-Sepsis/issues)** page.
 
 ---
 
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+```
+
+```
