@@ -206,7 +206,3 @@ If you encounter any bugs or have feature requests, please open an issue on our 
 ## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-```
-
-```
