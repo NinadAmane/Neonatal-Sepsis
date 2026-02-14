@@ -191,9 +191,10 @@ The table below summarizes the performance metrics of our **Global Best (Federat
 
 This project is developed and maintained by:
 
-* **[Pranay](https://github.com/pranay9981)** - *Maintainer*
+* **[Pranay Bagaria](https://github.com/pranay9981)** - *Maintainer*
 * **[Ninad Amane](https://github.com/NinadAmane)** - *Collaborator*
 * **[Rakshak](https://github.com/Rakshak05)** - *Collaborator*
+* **[Kushagra](https://github.com/kushagra69yr)** - *Collaborator*
 
 ---
 
